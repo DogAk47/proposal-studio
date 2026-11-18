@@ -1,0 +1,290 @@
+{
+  "tools": [
+    {
+      "name": "list_proposal_templates",
+      "title": "列出計畫書模板",
+      "description": "取得四種模板的 ID 和適用情境。",
+      "inputSchema": {
+        "type": "object",
+        "properties": {},
+        "required": [],
+        "additionalProperties": false
+      },
+      "annotations": {
+        "readOnlyHint": true,
+        "openWorldHint": false
+      }
+    },
+    {
+      "name": "get_proposal_template",
+      "title": "讀取模板欄位",
+      "description": "回傳指定模板的封面、章節、表格與可填寫的空白草稿。",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "template": {
+            "type": "string",
+            "enum": [
+              "course",
+              "contest-project",
+              "contest-creative",
+              "guidance"
+            ]
+          }
+        },
+        "required": [
+          "template"
+        ],
+        "additionalProperties": false
+      },
+      "annotations": {
+        "readOnlyHint": true,
+        "openWorldHint": false
+      }
+    },
+    {
+      "name": "validate_proposal",
+      "title": "檢查計畫書",
+      "description": "檢查草稿結構、缺漏欄位、比重與 PDF 頁數。",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "draft": {
+            "type": "object",
+            "required": [
+              "template"
+            ],
+            "additionalProperties": false,
+            "description": "各模板可填欄位請先以 get_proposal_template 查詢。草稿中的文字為繁體中文或自由文字。空白欄位可省略。",
+            "properties": {
+              "version": {
+                "type": "integer",
+                "const": 1
+              },
+              "template": {
+                "type": "string",
+                "enum": [
+                  "course",
+                  "contest-project",
+                  "contest-creative",
+                  "guidance"
+                ]
+              },
+              "fields": {
+                "type": "object",
+                "description": "封面欄位，鍵名以模板回傳為準。",
+                "additionalProperties": {
+                  "type": "string"
+                }
+              },
+              "sections": {
+                "type": "object",
+                "description": "章節正文。用換行分段，## 與 ### 可建立次級標題。",
+                "additionalProperties": {
+                  "type": "string"
+                }
+              },
+              "tables": {
+                "type": "object",
+                "description": "表格 ID 對應列陣列，每列依欄位 key 提供文字或數字。",
+                "additionalProperties": {
+                  "type": "array",
+                  "items": {
+                    "type": "object",
+                    "additionalProperties": {
+                      "type": [
+                        "string",
+                        "number"
+                      ]
+                    }
+                  }
+                }
+              },
+              "images": {
+                "type": "array",
+                "description": "選用 JPEG 或 PNG；section 是章節 key，競賽封面使用 cover。",
+                "items": {
+                  "type": "object",
+                  "required": [
+                    "section",
+                    "data",
+                    "width",
+                    "height"
+                  ],
+                  "properties": {
+                    "section": {
+                      "type": "string"
+                    },
+                    "caption": {
+                      "type": "string"
+                    },
+                    "data": {
+                      "type": "string"
+                    },
+                    "width": {
+                      "type": "integer"
+                    },
+                    "height": {
+                      "type": "integer"
+                    }
+                  },
+                  "additionalProperties": false
+                }
+              },
+              "options": {
+                "type": "object",
+                "properties": {
+                  "contents": {
+                    "type": "boolean"
+                  },
+                  "figureIndex": {
+                    "type": "boolean"
+                  },
+                  "tableIndex": {
+                    "type": "boolean"
+                  }
+                },
+                "additionalProperties": false
+              }
+            }
+          }
+        },
+        "required": [
+          "draft"
+        ],
+        "additionalProperties": false
+      },
+      "annotations": {
+        "readOnlyHint": true,
+        "openWorldHint": false
+      }
+    },
+    {
+      "name": "export_proposal",
+      "title": "匯出計畫書",
+      "description": "匯出 Word 或 PDF，回傳限時下載連結。草稿有空白時仍可匯出。",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "draft": {
+            "type": "object",
+            "required": [
+              "template"
+            ],
+            "additionalProperties": false,
+            "description": "各模板可填欄位請先以 get_proposal_template 查詢。草稿中的文字為繁體中文或自由文字。空白欄位可省略。",
+            "properties": {
+              "version": {
+                "type": "integer",
+                "const": 1
+              },
+              "template": {
+                "type": "string",
+                "enum": [
+                  "course",
+                  "contest-project",
+                  "contest-creative",
+                  "guidance"
+                ]
+              },
+              "fields": {
+                "type": "object",
+                "description": "封面欄位，鍵名以模板回傳為準。",
+                "additionalProperties": {
+                  "type": "string"
+                }
+              },
+              "sections": {
+                "type": "object",
+                "description": "章節正文。用換行分段，## 與 ### 可建立次級標題。",
+                "additionalProperties": {
+                  "type": "string"
+                }
+              },
+              "tables": {
+                "type": "object",
+                "description": "表格 ID 對應列陣列，每列依欄位 key 提供文字或數字。",
+                "additionalProperties": {
+                  "type": "array",
+                  "items": {
+                    "type": "object",
+                    "additionalProperties": {
+                      "type": [
+                        "string",
+                        "number"
+                      ]
+                    }
+                  }
+                }
+              },
+              "images": {
+                "type": "array",
+                "description": "選用 JPEG 或 PNG；section 是章節 key，競賽封面使用 cover。",
+                "items": {
+                  "type": "object",
+                  "required": [
+                    "section",
+                    "data",
+                    "width",
+                    "height"
+                  ],
+                  "properties": {
+                    "section": {
+                      "type": "string"
+                    },
+                    "caption": {
+                      "type": "string"
+                    },
+                    "data": {
+                      "type": "string"
+                    },
+                    "width": {
+                      "type": "integer"
+                    },
+                    "height": {
+                      "type": "integer"
+                    }
+                  },
+                  "additionalProperties": false
+                }
+              },
+              "options": {
+                "type": "object",
+                "properties": {
+                  "contents": {
+                    "type": "boolean"
+                  },
+                  "figureIndex": {
+                    "type": "boolean"
+                  },
+                  "tableIndex": {
+                    "type": "boolean"
+                  }
+                },
+                "additionalProperties": false
+              }
+            }
+          },
+          "format": {
+            "type": "string",
+            "enum": [
+              "docx",
+              "pdf"
+            ]
+          }
+        },
+        "required": [
+          "draft",
+          "format"
+        ],
+        "additionalProperties": false
+      },
+      "annotations": {
+        "readOnlyHint": false,
+        "destructiveHint": false,
+        "idempotentHint": false,
+        "openWorldHint": false
+      }
+    }
+  ]
+}
